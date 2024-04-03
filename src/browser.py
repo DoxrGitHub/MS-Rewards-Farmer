@@ -28,8 +28,7 @@ class Browser:
             self.proxy = args.proxy
         elif account.get("proxy"):
             self.proxy = account["proxy"]
-        self.userDataDir = self.setupProfiles()
-        self.browserConfig = Utils.getBrowserConfig(self.userDataDir)
+        self.browserConfig = Utils.getBrowserConfig()
         (
             self.userAgent,
             self.userAgentMetadata,
@@ -37,7 +36,7 @@ class Browser:
         ) = GenerateUserAgent().userAgent(self.browserConfig, mobile)
         if newBrowserConfig:
             self.browserConfig = newBrowserConfig
-            Utils.saveBrowserConfig(self.userDataDir, self.browserConfig)
+            Utils.saveBrowserConfig(self.browserConfig)
         self.webdriver = self.browserSetup()
         self.utils = Utils(self.webdriver)
 
@@ -86,7 +85,6 @@ class Browser:
         driver = webdriver.Chrome(
             options=options,
             seleniumwire_options=seleniumwireOptions,
-            user_data_dir=self.userDataDir.as_posix(),
         )
 
         seleniumLogger = logging.getLogger("seleniumwire")
@@ -106,7 +104,7 @@ class Browser:
                 "height": deviceHeight,
                 "width": deviceWidth,
             }
-            Utils.saveBrowserConfig(self.userDataDir, self.browserConfig)
+            Utils.saveBrowserConfig(self.browserConfig)
 
         if self.mobile:
             screenHeight = deviceHeight + 146
@@ -159,22 +157,8 @@ class Browser:
         return driver
 
     def setupProfiles(self) -> Path:
-        """
-        Sets up the sessions profile for the chrome browser.
-        Uses the username to create a unique profile for the session.
-
-        Returns:
-            Path
-        """
-        currentPath = Path(__file__)
-        parent = currentPath.parent.parent
-        sessionsDir = parent / "sessions"
-
-        # Concatenate username and browser type for a plain text session ID
-        sessionid = f"{self.username}"
-
-        sessionsDir = sessionsDir / sessionid
-        sessionsDir.mkdir(parents=True, exist_ok=True)
+        ## screw it all...
+        sessionsDir = "skibidi"
         return sessionsDir
 
     def getCCodeLang(self, lang: str, geo: str) -> tuple:
